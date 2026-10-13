@@ -1,0 +1,1396 @@
+/**
+ * LapCry control-deck interface.
+ *
+ * LapCry intentionally abandons the upstream three-column workbench. The
+ * workspace is rebuilt as a command deck: a slim command bar, a full-width
+ * pipeline rail and two instrument bays for the source and the result. The
+ * operations library moves into a slide-over vault. Structural selectors used
+ * by the engine (operation cards, editors, status bars) are preserved so every
+ * operation, drag interaction and recipe still behaves correctly.
+ *
+ * @author Bin9chn
+ * @copyright LapCry 2026
+ * @license Apache-2.0
+ */
+
+:root {
+    --title-height: 40px;
+    --tab-height: 38px;
+    --lc-bar-height: 60px;
+    --lc-gap: 12px;
+    --lc-radius: 10px;
+    --lc-radius-sm: 7px;
+    --lc-splitter-height: 14px;
+    --lc-vault-width: min(420px, 90vw);
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: var(--primary-background-colour);
+    color: var(--primary-font-colour);
+}
+
+body {
+    font-family: var(--primary-font-family);
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+/* ------------------------------------------------------------------ *
+ * Command bar
+ * ------------------------------------------------------------------ */
+
+#banner.lc-topbar {
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    height: var(--lc-bar-height);
+    padding: 0 14px;
+    line-height: normal;
+    color: var(--banner-font-colour);
+    background: var(--banner-bg-colour);
+    border-bottom: 1px solid var(--primary-border-colour);
+    box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--lapcry-accent) 40%, transparent);
+    z-index: 360;
+}
+
+.lc-brand-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.lapcry-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: var(--primary-font-colour);
+    text-decoration: none;
+}
+
+.lapcry-brand:hover,
+.lapcry-brand:focus {
+    color: var(--primary-font-colour);
+    text-decoration: none;
+}
+
+.lapcry-brand-mark {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 7px;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--lapcry-accent) 34%, transparent);
+}
+
+.lapcry-brand-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.04;
+    min-width: 0;
+}
+
+.lapcry-brand-name {
+    font-size: 16px;
+    font-weight: 760;
+    letter-spacing: 0;
+    color: var(--primary-font-colour);
+}
+
+.lapcry-brand-subtitle {
+    color: var(--subtext-font-colour);
+    font-size: 10px;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.lapcry-build-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 7px;
+    border: 1px solid var(--primary-border-colour);
+    border-radius: 4px;
+    color: var(--lapcry-warning);
+    background: var(--lapcry-surface-alt);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ *
+ * Command palette (operation search)
+ * ------------------------------------------------------------------ */
+
+.lc-command {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    height: 38px;
+    padding: 0 12px;
+    z-index: 80;
+    overflow: visible;
+    border: 1px solid var(--primary-border-colour);
+    border-radius: 9px;
+    background: var(--lapcry-surface-alt);
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+#notice-wrapper.lc-command {
+    overflow: visible;
+}
+
+/* bootstrap-material-design wraps form controls in a block-level span, which breaks the flex
+   alignment of the command bar. Dissolve the wrapper so the input stays a flex child. */
+.lc-command > .bmd-form-group {
+    display: contents;
+}
+
+.lc-command:focus-within {
+    border-color: var(--lapcry-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lapcry-accent) 18%, transparent);
+}
+
+.lc-command-icon {
+    flex: 0 0 auto;
+    font-size: 18px !important;
+    color: var(--subtext-font-colour);
+}
+
+.lc-command #search {
+    flex: 1 1 auto;
+    width: auto;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    background-image: none;
+    color: var(--primary-font-colour);
+    box-shadow: none;
+    font-size: 13px;
+}
+
+.lc-command #search:focus {
+    border: 0;
+    box-shadow: none;
+    filter: none;
+}
+
+.lc-command #search::placeholder {
+    color: var(--subtext-font-colour);
+}
+
+.lc-command-key {
+    flex: 0 0 auto;
+    min-width: 18px;
+    height: 20px;
+    padding: 0 5px;
+    border: 1px solid var(--primary-border-colour);
+    border-radius: 4px;
+    background: var(--lapcry-surface);
+    color: var(--subtext-font-colour);
+    font-family: var(--fixed-width-font-family);
+    font-size: 11px;
+    line-height: 18px;
+    text-align: center;
+}
+
+.lc-command-results {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 70;
+    max-height: 54vh;
+    margin: 0;
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid var(--primary-border-colour);
+    border-radius: var(--lc-radius);
+    background: var(--lapcry-surface-raised);
+    box-shadow: var(--lapcry-shadow);
+}
+
+.lc-command-results:empty {
+    display: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Top bar controls
+ * ------------------------------------------------------------------ */
+
+.lc-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.lc-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--banner-url-colour);
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.lc-icon-btn:hover,
+.lc-icon-btn:focus {
+    border-color: var(--primary-border-colour);
+    background: var(--lapcry-surface-alt);
+    color: var(--lapcry-accent);
+    outline: none;
+}
+
+.lc-icon-btn i {
+    font-size: 20px;
+    padding: 0;
+}
+
+.lc-engine-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 9px;
+    border: 1px solid color-mix(in srgb, var(--lapcry-success) 38%, var(--primary-border-colour));
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--lapcry-success) 8%, var(--lapcry-surface-alt));
+    color: var(--lapcry-success);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.lc-engine-state i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 15%, transparent);
+}
+
+#banner .lc-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    margin-left: 0;
+    padding: 0 9px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--banner-url-colour);
+    text-decoration: none;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+#banner .lc-action:hover,
+#banner .lc-action:focus {
+    border-color: var(--primary-border-colour);
+    background: var(--lapcry-surface-alt);
+    color: var(--lapcry-accent);
+    text-decoration: none;
+}
+
+#banner .lc-action i {
+    padding: 0;
+    font-size: 20px;
+}
+
+button.lc-action {
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+#notice {
+    display: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Control deck
+ * ------------------------------------------------------------------ */
+
+#workspace-wrapper {
+    position: absolute;
+    top: var(--lc-bar-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows:
+        minmax(142px, var(--lc-recipe-size, 30%))
+        var(--lc-splitter-height)
+        minmax(160px, 1fr);
+    column-gap: var(--lc-gap);
+    row-gap: 0;
+    padding: var(--lc-gap);
+    background-color: var(--primary-background-colour);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--lapcry-grid) 46%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--lapcry-grid) 46%, transparent) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Drag handle between the pipeline rail and the two instrument bays. */
+.lc-splitter {
+    position: relative;
+    grid-row: 2;
+    display: grid;
+    place-items: center;
+    height: var(--lc-splitter-height);
+    margin: 0;
+    cursor: row-resize;
+    background: transparent;
+    touch-action: none;
+}
+
+.lc-splitter-grip {
+    width: clamp(64px, 12%, 180px);
+    height: 4px;
+    border-radius: 999px;
+    background: var(--primary-border-colour);
+    transition: width 140ms ease, background 140ms ease;
+}
+
+.lc-splitter:hover .lc-splitter-grip,
+.lc-splitter:focus-visible .lc-splitter-grip,
+.lc-splitter.is-active .lc-splitter-grip {
+    width: clamp(120px, 24%, 320px);
+    background: var(--lapcry-accent);
+}
+
+.lc-splitter:focus-visible {
+    outline: none;
+}
+
+/* While dragging, pointer events belong to the handle, not the editors underneath. */
+body.lc-resizing {
+    cursor: row-resize;
+    user-select: none;
+}
+
+body.lc-resizing #input-text,
+body.lc-resizing #output-text,
+body.lc-resizing #rec-list {
+    pointer-events: none;
+}
+
+#recipe {
+    width: auto;
+    height: auto;
+    grid-row: 1;
+}
+
+section#recipe.lc-panel {
+    width: auto;
+    height: auto;
+}
+
+#IO {
+    width: auto;
+    height: auto;
+    grid-row: 3;
+}
+
+/* Instrument panel chrome. */
+.lc-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid var(--primary-border-colour);
+    border-radius: var(--lc-radius);
+    background: var(--lapcry-surface);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--primary-border-colour) 60%, transparent);
+}
+
+section#input.lc-panel,
+section#output.lc-panel {
+    width: auto;
+    height: auto;
+}
+
+.lc-panel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(color-mix(in srgb, var(--lapcry-accent) 70%, transparent), transparent);
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.lc-panel > .lc-operation-surface,
+.lc-panel > #input-wrapper,
+.lc-panel > #output-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: 0 0 var(--title-height);
+    min-height: var(--title-height);
+    height: var(--title-height);
+    padding: 0 10px 0 12px;
+    color: var(--title-colour);
+    background: var(--title-background-colour);
+    border-bottom: 1px solid var(--primary-border-colour);
+    font-size: var(--title-size);
+    font-weight: var(--title-weight);
+    line-height: normal;
+}
+
+.title::before,
+.title::after {
+    display: none;
+}
+
+.lc-panel-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 21px;
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--lapcry-accent) 55%, transparent);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--lapcry-accent) 8%, transparent);
+    color: var(--lapcry-accent);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.lc-panel-label {
+    font-weight: var(--title-weight);
+    white-space: nowrap;
+}
+
+.lc-panel-role {
+    margin-left: 2px;
+    color: var(--subtext-font-colour);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+}
+
+.op-count {
+    color: var(--lapcry-accent);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+}
+
+.pane-controls {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+}
+
+.pane-controls .btn {
+    margin: 0 0 0 2px;
+}
+
+.io-info {
+    color: var(--subtext-font-colour);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------------ *
+ * Pipeline rail
+ * ------------------------------------------------------------------ */
+
+#recipe.lc-pipeline {
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+#controls {
+    position: static;
+    bottom: auto;
+    width: auto;
+    border-top: 0;
+    padding: 6px 12px;
+    background: var(--lapcry-surface-raised);
+    border-bottom: 1px solid var(--primary-border-colour);
+}
+
+#controls .form-group {
+    margin: 0;
+}
+
+#controls-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    transform-origin: left center;
+}
+
+#controls .btn {
+    min-height: 34px;
+    margin: 0;
+    border-radius: var(--lc-radius-sm);
+}
+
+#step {
+    flex: 0 0 auto;
+    min-width: 84px;
+    padding: 0 14px;
+    border: 1px solid var(--primary-border-colour);
+    background: var(--lapcry-surface-alt);
+    color: var(--primary-font-colour);
+    font-weight: 650;
+}
+
+#step:hover {
+    border-color: var(--lapcry-accent);
+    color: var(--lapcry-accent-strong);
+}
+
+#bake {
+    flex: 0 1 320px;
+    width: auto;
+    min-width: 168px;
+    max-width: 320px;
+    min-height: 34px;
+    margin: 0;
+    white-space: nowrap;
+    border: 1px solid var(--btn-success-border-colour);
+    border-radius: var(--lc-radius-sm);
+    background: var(--btn-success-bg-colour);
+    color: var(--btn-success-font-colour);
+    box-shadow: none;
+    font-weight: 760;
+}
+
+#bake:hover {
+    background: var(--btn-success-hover-bg-colour);
+    border-color: var(--btn-success-hover-border-colour);
+    color: var(--btn-success-hover-font-colour);
+    box-shadow: none;
+}
+
+#bake img {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    opacity: 0.95;
+}
+
+#bake span {
+    white-space: nowrap;
+}
+
+#auto-bake-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 0 auto;
+    white-space: nowrap;
+    width: auto;
+    min-width: 0;
+    padding: 0 8px;
+    color: var(--primary-font-colour);
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+#auto-bake-label br {
+    display: none;
+}
+
+#auto-bake-label input[type="checkbox"] {
+    position: static;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+#rec-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    order: initial;
+    min-height: 0;
+    margin: 0;
+    padding: 12px 14px 14px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    counter-reset: pipeline;
+    background: var(--lapcry-surface-alt);
+}
+
+/* Empty-state cue, so the rail does not read as a broken blank panel. */
+#rec-list:empty::before {
+    content: "拖拽或双击左侧操作库中的步骤到这里";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 84px;
+    border: 1px dashed var(--primary-border-colour);
+    border-radius: var(--lc-radius-sm);
+    color: var(--subtext-font-colour);
+    font-size: 12px;
+    letter-spacing: 0;
+}
+
+html[lang="en-US"] #rec-list:empty::before {
+    content: "Drag or double-click an operation from the catalog";
+}
+
+#rec-list li.operation {
+    counter-increment: pipeline;
+    position: relative;
+    flex: 0 0 auto;
+    align-self: stretch;
+    min-height: 0;
+    margin: 0;
+    padding: 10px 12px 12px 50px;
+    border: 1px solid var(--rec-list-operation-border-colour);
+    border-top: 3px solid var(--lapcry-success);
+    border-radius: var(--lc-radius-sm);
+    background: var(--rec-list-operation-bg-colour);
+    color: var(--rec-list-operation-font-colour);
+    box-shadow: 0 6px 16px rgba(15, 33, 40, 0.08);
+}
+
+#rec-list li.operation::before {
+    content: counter(pipeline, decimal-leading-zero);
+    position: absolute;
+    top: 11px;
+    left: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 22px;
+    border: 1px solid var(--lapcry-accent);
+    border-radius: 4px;
+    background: var(--lapcry-surface);
+    color: var(--lapcry-accent);
+    font-family: var(--fixed-width-font-family);
+    font-size: 10px;
+    font-weight: 700;
+}
+
+#rec-list li.operation:last-child {
+    margin-bottom: 0;
+}
+
+.op-title {
+    min-height: 22px;
+    padding: 0 92px 0 3px;
+    font-weight: var(--op-title-font-weight);
+}
+
+#rec-list li.operation .op-title {
+    font-size: 13px;
+    line-height: 22px;
+}
+
+.ingredients {
+    margin-top: 2px;
+    border-top: 1px solid var(--secondary-border-colour);
+}
+
+.arg,
+.form-control,
+select.arg {
+    border-radius: 5px;
+}
+
+.operation .form-control {
+    border: 1px solid var(--arg-border-colour);
+    border-radius: 5px;
+    background-color: var(--arg-background);
+    background-image: none !important;
+    color: var(--arg-font-colour);
+}
+
+.operation .form-control:focus {
+    border-color: var(--lapcry-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--lapcry-accent) 14%, transparent);
+    filter: none;
+}
+
+.operation label,
+.operation .checkbox label {
+    color: var(--arg-label-colour);
+}
+
+.recip-icons {
+    top: 10px;
+    right: 8px;
+}
+
+.op-icon,
+.recip-icons i {
+    color: var(--subtext-font-colour);
+}
+
+.disable-icon-selected,
+.breakpoint-selected {
+    color: var(--lapcry-danger);
+}
+
+/* ------------------------------------------------------------------ *
+ * Source / result bays
+ * ------------------------------------------------------------------ */
+
+#IO {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--lc-gap);
+    min-width: 0;
+    min-height: 0;
+}
+
+#input-wrapper,
+#output-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--lapcry-surface);
+}
+
+#input-wrapper > #input-tabs-wrapper,
+#output-wrapper > #output-tabs-wrapper {
+    flex: 0 0 auto;
+}
+
+#input-wrapper > #input-text,
+#output-wrapper > #output-text {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+}
+
+#input-wrapper.show-tabs,
+#output-wrapper.show-tabs {
+    height: auto;
+}
+
+#input-text,
+#output-text {
+    background: var(--lapcry-surface);
+}
+
+.cm-editor .cm-content {
+    padding: 10px 12px;
+    font-family: var(--fixed-width-font-family);
+    font-size: var(--fixed-width-font-size);
+    color: var(--fixed-width-font-colour);
+}
+
+.cm-editor.cm-focused {
+    outline: none;
+}
+
+.cm-status-bar {
+    margin: 0 8px;
+    color: var(--subtext-font-colour);
+    font-family: var(--fixed-width-font-family);
+    font-size: 11px;
+}
+
+#input-tabs-wrapper,
+#output-tabs-wrapper {
+    background: var(--lapcry-surface-alt);
+    border-bottom: 1px solid var(--primary-border-colour);
+}
+
+#input-tabs-wrapper #input-tabs,
+#output-tabs-wrapper #output-tabs {
+    background: transparent;
+    border-bottom: 0;
+    border-left: 0;
+}
+
+#input-tabs li,
+#output-tabs li,
+.input-tab-buttons,
+.output-tab-buttons {
+    color: var(--primary-font-colour);
+    background: transparent;
+    border-color: var(--primary-border-colour);
+}
+
+#input-tabs li:hover,
+#output-tabs li:hover,
+.input-tab-buttons:hover,
+.output-tab-buttons:hover {
+    background: var(--lapcry-surface-raised);
+}
+
+.active-input-tab,
+.active-output-tab {
+    color: var(--lapcry-accent);
+    background: var(--lapcry-surface-raised);
+    box-shadow: inset 0 -2px 0 var(--lapcry-accent);
+}
+
+#output-loader {
+    flex-direction: column;
+    gap: 14px;
+    background: var(--lapcry-surface-raised);
+}
+
+#output-loader-animation {
+    position: static;
+    display: flex;
+    width: auto;
+    height: auto;
+    justify-content: center;
+}
+
+#lapcry-loader-mark {
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--lapcry-accent) 24%, transparent);
+    animation: lapcry-output-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes lapcry-output-pulse {
+    0%,
+    100% {
+        opacity: 0.58;
+        transform: scale(0.96);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ------------------------------------------------------------------ *
+ * Operations vault (slide-over library)
+ * ------------------------------------------------------------------ */
+
+.lc-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 340;
+    display: none;
+    pointer-events: none;
+    background: color-mix(in srgb, #05080b 52%, transparent);
+}
+
+/* Visibility follows the shell state rather than the hidden attribute, so the scrim cannot be
+   left covering the workspace by a stray attribute toggle. */
+body.vault-open .lc-scrim {
+    display: block;
+    pointer-events: auto;
+}
+
+/* Dragging an operation out of the catalog has to reach the recipe behind the scrim. */
+body.catalog-drag .lc-scrim {
+    pointer-events: none;
+}
+
+.lc-vault {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 350;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    width: var(--lc-vault-width);
+    max-width: 100%;
+    margin: var(--lc-gap) 0 var(--lc-gap) var(--lc-gap);
+    border: 1px solid var(--primary-border-colour);
+    border-radius: var(--lc-radius);
+    background: var(--lapcry-surface-raised);
+    box-shadow: var(--lapcry-shadow);
+    transform: translateX(calc(-100% - var(--lc-gap) - 4px));
+    transition: transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+body.vault-open .lc-vault {
+    transform: translateX(0);
+}
+
+div#operations.lc-vault {
+    width: var(--lc-vault-width);
+    height: auto;
+}
+
+.lc-vault .title {
+    border-top-left-radius: var(--lc-radius);
+    border-top-right-radius: var(--lc-radius);
+}
+
+.lc-vault-close {
+    margin-left: auto;
+}
+
+/* CodeMirror gives its sticky editor panels a very high stacking order, which would punch
+   them through the slide-over catalog. Keep them inside their own bay. */
+#workspace-wrapper .cm-panels {
+    z-index: 1;
+}
+
+.lc-operation-surface {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* While the catalog is open the palette results dock into its body instead of floating over it. */
+.lc-operation-surface .lc-command-results {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    order: -1;
+    width: auto;
+    max-height: 46%;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid var(--primary-border-colour);
+    border-radius: 0;
+    background: var(--lapcry-surface-alt);
+    box-shadow: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Operation catalog
+ * ------------------------------------------------------------------ */
+
+#categories,
+#search-results,
+#rec-list {
+    background: var(--lapcry-surface);
+}
+
+#categories {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#search-results {
+    flex: 0 0 auto;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 9px 12px 8px;
+    border-bottom: 1px solid var(--secondary-border-colour);
+    color: var(--title-colour);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.category-title::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    margin-right: 8px;
+    border-radius: 1px;
+    background: var(--lapcry-accent);
+}
+
+.category-title:hover {
+    background: var(--lapcry-surface-alt);
+}
+
+.op-list {
+    margin: 0;
+    padding: 5px 8px 9px;
+}
+
+.op-list li.operation {
+    margin: 5px 0;
+    padding: 9px 11px;
+    border: 1px solid var(--op-list-operation-border-colour);
+    border-left: 3px solid var(--lapcry-accent);
+    border-radius: 6px;
+    background: var(--op-list-operation-bg-colour);
+    color: var(--op-list-operation-font-colour);
+    box-shadow: none;
+    transition: transform 110ms ease, border-color 110ms ease, background-color 110ms ease;
+}
+
+.op-list li.operation:hover {
+    transform: translateX(2px);
+    border-color: var(--lapcry-accent);
+}
+
+/* ------------------------------------------------------------------ *
+ * Buttons, modals and options
+ * ------------------------------------------------------------------ */
+
+.btn,
+.bmd-btn-icon {
+    border-radius: 5px;
+    box-shadow: none;
+}
+
+.btn-primary {
+    color: #ffffff;
+    background: var(--lapcry-accent-strong);
+    border-color: var(--lapcry-accent-strong);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    color: #ffffff;
+    background: var(--lapcry-accent);
+    border-color: var(--lapcry-accent);
+}
+
+.btn-success {
+    color: var(--btn-success-font-colour);
+    background: var(--btn-success-bg-colour);
+    border-color: var(--btn-success-border-colour);
+}
+
+.btn-danger {
+    background: var(--lapcry-danger);
+    border-color: var(--lapcry-danger);
+}
+
+.modal-content {
+    border: 1px solid var(--primary-border-colour);
+    border-radius: var(--lc-radius);
+    background: var(--lapcry-surface-raised);
+    color: var(--primary-font-colour);
+    box-shadow: var(--lapcry-shadow);
+    overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+    background: var(--title-background-colour);
+    border-color: var(--primary-border-colour);
+}
+
+.modal-title {
+    font-weight: 720;
+}
+
+.modal-body {
+    max-height: 72vh;
+    overflow-y: auto;
+}
+
+.nav-tabs {
+    border-bottom-color: var(--primary-border-colour);
+}
+
+.nav-tabs .nav-link {
+    color: var(--subtext-font-colour);
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--lapcry-accent);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-font-colour);
+    background: var(--lapcry-surface-raised);
+    border-color: var(--primary-border-colour) var(--primary-border-colour) var(--lapcry-surface-raised);
+}
+
+.option-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--secondary-border-colour);
+}
+
+.option-item:last-child {
+    border-bottom: 0;
+}
+
+.option-item select,
+.option-item input[type=text],
+.option-item input[type=number],
+.option-item textarea {
+    background: var(--lapcry-surface-alt);
+    color: var(--primary-font-colour);
+    border: 1px solid var(--primary-border-colour);
+    border-radius: 5px;
+}
+
+#options-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px 18px;
+}
+
+@media (min-width: 980px) {
+    #options-body {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #options-body > p,
+    #options-body > .option-item:first-of-type,
+    #options-body > .option-item:nth-of-type(2) {
+        grid-column: span 2;
+    }
+}
+
+.custom-function-panel {
+    grid-column: 1 / -1;
+}
+
+.custom-function-intro,
+.custom-function-status {
+    margin: 6px 0;
+    color: var(--subtext-font-colour);
+    font-size: 12px;
+}
+
+.custom-function-grid {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) 140px;
+    gap: 10px 14px;
+}
+
+.custom-function-body-group {
+    grid-column: 1 / -1;
+}
+
+#custom-function-body {
+    min-height: 150px;
+    font-family: var(--fixed-width-font-family);
+    font-size: 13px;
+    resize: vertical;
+}
+
+.custom-function-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.custom-function-status.error {
+    color: var(--lapcry-danger);
+}
+
+.popover {
+    background: var(--popover-background);
+    border-color: var(--popover-border-colour);
+    color: var(--primary-font-colour);
+}
+
+.dropdown-menu {
+    background: var(--lapcry-surface-raised);
+    border-color: var(--primary-border-colour);
+    box-shadow: var(--lapcry-shadow);
+}
+
+.dropdown-item {
+    color: var(--primary-font-colour);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--lapcry-surface-alt);
+    color: var(--lapcry-accent);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--scrollbar-track);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
+}
+
+/* ------------------------------------------------------------------ *
+ * Maximised output
+ * ------------------------------------------------------------------ */
+
+body.output-maximised #workspace-wrapper {
+    grid-template-rows: minmax(0, 1fr);
+}
+
+body.output-maximised #recipe {
+    display: none;
+}
+
+body.output-maximised #IO {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+body.output-maximised #input {
+    display: none;
+}
+
+body.output-maximised #output {
+    border-radius: var(--lc-radius);
+}
+
+/* ------------------------------------------------------------------ *
+ * Technology accents
+ * ------------------------------------------------------------------ */
+
+#banner.lc-topbar {
+    background: linear-gradient(
+        180deg,
+        var(--banner-bg-colour),
+        color-mix(in srgb, var(--banner-bg-colour) 88%, var(--lapcry-surface-alt))
+    );
+    backdrop-filter: blur(16px);
+}
+
+.lapcry-brand-name {
+    background: linear-gradient(94deg, var(--lapcry-accent-strong), var(--lapcry-accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lc-panel {
+    box-shadow: var(--lapcry-shadow-soft);
+}
+
+#bake {
+    background-image: linear-gradient(135deg, var(--lapcry-accent), var(--lapcry-accent-strong));
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--lapcry-accent) 30%, transparent);
+}
+
+#bake:hover {
+    background-image: linear-gradient(135deg, var(--lapcry-accent-strong), var(--lapcry-accent));
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--lapcry-accent) 42%, transparent);
+}
+
+/* ------------------------------------------------------------------ *
+ * Responsive behaviour
+ * ------------------------------------------------------------------ */
+
+@media (max-width: 1180px) {
+    .lapcry-brand-subtitle,
+    .lapcry-build-badge,
+    .lc-engine-state {
+        display: none;
+    }
+
+    #banner.lc-topbar {
+        grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 940px) {
+    #workspace-wrapper {
+        grid-template-rows: minmax(210px, 46%) minmax(0, 1fr);
+    }
+
+    #IO {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 720px) {
+    #banner.lc-topbar {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 0 8px;
+    }
+
+    .lapcry-brand-copy {
+        display: none;
+    }
+
+    .lc-command-key {
+        display: none;
+    }
+
+    #banner .lc-action {
+        padding: 0 6px;
+    }
+
+    .custom-function-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .custom-function-body-group {
+        grid-column: auto;
+    }
+}
+
+/* ------------------------------------------------------------------ *
+ * Dialogs
+ * ------------------------------------------------------------------ */
+
+/* The About pane used to inherit a bare floated <img>, which let the 64px logo render at the
+   browser default replacement size and swamp the text. Give it a fixed badge size instead. */
+.about-img-left {
+    float: none;
+    width: 64px;
+    height: 64px;
+    margin: 0 0 12px;
+    border-radius: 14px;
+}
+
+#support-modal .modal-body,
+#options-modal .modal-body {
+    line-height: 1.55;
+}

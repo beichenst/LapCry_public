@@ -1,0 +1,63 @@
+
+> lapcry@0.0.8 test
+> npx grunt configTests && node --no-warnings --no-deprecation --openssl-legacy-provider tests/node/index.mjs && node --no-warnings --no-deprecation --openssl-legacy-provider --trace-uncaught tests/operations/index.mjs
+
+Running "clean:config" (clean) task
+>> 27 paths cleaned.
+
+Running "clean:nodeConfig" (clean) task
+>> 1 path cleaned.
+
+Running "exec:generateConfig" (exec) task
+'\n--- Regenerating config files. ---'
+generateHTMLEntities: 1446 encode names, 2032 decode names, 586 aliases, 59 overrides applied.
+Written operation index.
+Written operation tests index.
+Written OperationConfig.json
+Written Ciphers module
+Written Default module
+Written Encodings module
+Written Image module
+Written Crypto module
+Written Serialise module
+Written Hashing module
+Written Bletchley module
+Written Compression module
+Written Code module
+Written LapCry module
+Written Diff module
+Written Shellcode module
+Written Charts module
+Written Regex module
+Written PGP module
+Written PublicKey module
+Written Jq module
+Written OCR module
+Written URL module
+Written UserAgent module
+Written Protobuf module
+Written File module
+Written Handlebars module
+Written Yara module
+Written OpModules.mjs
+'--- Config scripts finished. ---\n'
+(node:39364) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running "exec:generateNodeIndex" (exec) task
+'\n--- Regenerating node index ---'
+'--- Node index generated. ---\n'
+
+Done.
+Running Node API tests...
+
+TOTAL	279
+PASSING	279
+
+
+Running operation tests...
+
+TOTAL	2330
+PASSING	2330
+
+

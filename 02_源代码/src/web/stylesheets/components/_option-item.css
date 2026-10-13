@@ -1,0 +1,26 @@
+/**
+ * Options dialog field alignment.
+ *
+ * The shared `.option-item` rule trims the vertical padding that Material
+ * Design relies on to float a label above its control. Rows that pair a
+ * floating label with a select/input keep that top padding so the label
+ * floats above the value instead of landing on top of it.
+ *
+ * @license Apache-2.0
+ */
+
+.form-group.option-item {
+    padding-top: 1.75rem;
+}
+
+.form-group.option-item > .bmd-label-floating,
+.form-group.option-item > [class^="bmd-label"],
+.form-group.option-item > [class*=" bmd-label"] {
+    top: 1rem;
+    left: 12px;
+}
+
+/* The console log-level selector sits in a two-column grid cell. */
+.form-group.option-item > select.form-control {
+    width: 100%;
+}

@@ -1,0 +1,16 @@
+# LapCry_public — repository ignore rules
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+
+# Build output produced by 03_构建与打包\一键构建.ps1
+/dist/
+
+# Caches if the bundled source tree is built in place
+02_源代码/node_modules/
+02_源代码/build/
+02_源代码/desktop/**/bin/
+02_源代码/desktop/**/obj/
+02_源代码/tests/browser/output/

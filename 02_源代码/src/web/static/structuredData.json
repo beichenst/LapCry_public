@@ -1,0 +1,26 @@
+[
+    {
+        "@context": "http://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "url": "https://github.com/Bin9chn/LapCry",
+                "logo": "https://github.com/Bin9chn/LapCry/raw/main/src/web/static/images/lapcry-mark.svg",
+                "sameAs": [
+                    "https://github.com/Bin9chn/LapCry",
+                    "https://www.npmjs.com/package/lapcry"
+                ]
+            },
+            {
+                "@type": "WebSite",
+                "url": "https://github.com/Bin9chn/LapCry",
+                "name": "LapCry",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://github.com/Bin9chn/LapCry?op={operation_search_term}",
+                    "query-input": "required name=operation_search_term"
+                }
+            }
+        ]
+    }
+]

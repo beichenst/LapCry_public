@@ -1,0 +1,93 @@
+
+> lapcry@0.0.8 build
+> npx grunt prod
+
+Running "eslint:configs" (eslint) task
+
+Running "eslint:core" (eslint) task
+
+Running "eslint:web" (eslint) task
+
+Running "eslint:node" (eslint) task
+
+Running "eslint:tests" (eslint) task
+
+Running "clean:prod" (clean) task
+>> 14 paths cleaned.
+
+Running "clean:config" (clean) task
+>> 27 paths cleaned.
+
+Running "exec:generateConfig" (exec) task
+'\n--- Regenerating config files. ---'
+generateHTMLEntities: 1446 encode names, 2032 decode names, 586 aliases, 59 overrides applied.
+Written operation index.
+Written operation tests index.
+Written OperationConfig.json
+Written Ciphers module
+Written Default module
+Written Encodings module
+Written Image module
+Written Crypto module
+Written Serialise module
+Written Hashing module
+Written Bletchley module
+Written Compression module
+Written Code module
+Written LapCry module
+Written Diff module
+Written Shellcode module
+Written Charts module
+Written Regex module
+Written PGP module
+Written PublicKey module
+Written Jq module
+Written OCR module
+Written URL module
+Written UserAgent module
+Written Protobuf module
+Written File module
+Written Handlebars module
+Written Yara module
+Written OpModules.mjs
+'--- Config scripts finished. ---\n'
+(node:33588) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running "findModules" task
+Found 24 modules.
+
+Running "webpack:web" (webpack) task
+<i> [webpack-bundle-analyzer] Webpack Bundle Analyzer saved report to C:\Users\Administrator\Desktop\LapCry\build\prod\BundleAnalyzerReport.html
+assets by status [1m[33m58 MiB[39m[22m [1m[33m[big][39m[22m
+  assets by path [1m[32mmodules/*.js[39m[22m 28.9 MiB 24 assets
+  assets by path [1m[32massets/[39m[22m 29.2 MiB 5 assets
+assets by path [1m[32massets/fonts/[39m[22m 310 KiB
+  assets by path [1m[32massets/fonts/*.png[39m[22m 205 KiB 4 assets
+  assets by path [1m[32massets/fonts/*.fnt[39m[22m 105 KiB 4 assets
+assets by path [1m[32m*.txt[39m[22m 39.2 KiB
+  asset [1m[32mChefWorker.js.LICENSE.txt[39m[22m 20.7 KiB [1m[32m[emitted][39m[22m
+  asset [1m[32mDishWorker.js.LICENSE.txt[39m[22m 5.46 KiB [1m[32m[emitted][39m[22m
+  asset [1m[32mZipWorker.js.LICENSE.txt[39m[22m 5.42 KiB [1m[32m[emitted][39m[22m
+  + 2 assets
+asset [1m[32massets/tesseract/worker.min.js[39m[22m 108 KiB [1m[32m[emitted][39m[22m [from: node_modules/tesseract.js/dist/worker.min.js] [1m[32m[copied][39m[22m [1m[32m[minimized][39m[22m 3 related assets
+asset [1m[32mindex.html[39m[22m 43.6 KiB [1m[32m[emitted][39m[22m [1m[32m[minimized][39m[22m 2 related assets
+asset [1m[32massets/forge/prime.worker.min.js[39m[22m 20.9 KiB [1m[32m[emitted][39m[22m [from: node_modules/node-forge/dist/prime.worker.min.js] [1m[32m[copied][39m[22m [1m[32m[minimized][39m[22m 2 related assets
+asset [1m[32mimages/file-128x128.png[39m[22m 18.9 KiB [1m[32m[emitted][39m[22m [from: src/web/static/images/file-128x128.png] (auxiliary name: main)
+webpack 5.110.3 compiled [1m[32msuccessfully[39m[22m in 70673 ms
+
+Running "copy:standalone" (copy) task
+Copied 1 file
+
+Running "zip:standalone" (zip) task
+File "build/prod/LapCry_v0.0.8.zip" created.
+
+Running "clean:standalone" (clean) task
+>> 1 path cleaned.
+
+Running "calcDownloadHash" task
+
+Running "chmod:build" (chmod) task
+>> 1728 files had their `chmod` mode set to "755".
+
+Done.
